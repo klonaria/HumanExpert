@@ -13,14 +13,33 @@
             android:textColor="@android:color/black"
             android:gravity="center_horizontal"
             android:textStyle="bold"
-            android:maxLines="2"/>
-
-    <ListView
+            android:maxLines="3"/>
+    <ImageView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/lvQuestionsDF"
-            android:layout_margin="10dp"
-            android:layout_below="@+id/tvDescriptionText_DF">
+            android:layout_height="wrap_content"
+            android:id="@+id/imDescriptionLogo_DF"
+            android:layout_below="@+id/tvDescriptionText_DF"
+            android:layout_above="@+id/llBlockCheckButton_DF"/>
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:id="@+id/llBlockCheckButton_DF"
+            >
 
-    </ListView>
+        <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:id="@+id/btnNegative"
+                android:layout_weight="1"/>
+
+        <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_weight="1"
+                android:id="@+id/btnPositive"/>
+            </LinearLayout>
 </RelativeLayout>

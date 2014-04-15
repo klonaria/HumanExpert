@@ -1,10 +1,11 @@
-package com.human.expert;
+package com.human.expert.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.MenuItem;
+import com.human.expert.R;
 
 public class MainActivity extends Activity {
 

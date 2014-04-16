@@ -2,6 +2,7 @@ package com.human.expert.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
@@ -45,8 +46,8 @@ public class MenuFragment extends Fragment implements AdapterView.OnItemClickLis
                 downloadScenarios.execute(Constants.URL_DOMAIN + Constants.FIELD_SCENARIOS + Constants.URL_RM);
                 mListMenu.setAdapter(mAdapter);
             } else Toast.makeText(mActivity,
-                mActivity.getResources().getString(R.string.no_internet),
-                Toast.LENGTH_SHORT).show();
+                    mActivity.getResources().getString(R.string.no_internet),
+                    Toast.LENGTH_SHORT).show();
         } else
             mListMenu.setAdapter(mAdapter);
     }
@@ -64,8 +65,15 @@ public class MenuFragment extends Fragment implements AdapterView.OnItemClickLis
         bundle.putInt(Constants.BUNDLE_POSITION, position);
         bundle.putInt(Constants.FIELD_ID, ListsData.getScenariosList().get(position).caseId);
         detailFragment.setArguments(bundle);
-
+        clearBackStack();
         ((MainActivity) mActivity).showDetailFragment(detailFragment);
+    }
+
+    private void clearBackStack() {
+        FragmentManager fm = mActivity.getFragmentManager();
+        for (int i = 0; i < fm.getBackStackEntryCount(); ++i) {
+            fm.popBackStack();
+        }
     }
 
     private static boolean isInternetConnected(Context context) {

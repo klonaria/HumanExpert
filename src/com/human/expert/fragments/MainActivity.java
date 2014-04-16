@@ -30,7 +30,6 @@ public class MainActivity extends Activity {
                     replace(R.id.flMainContent_M, new MenuFragment()).
                     commit();
         }
-        getActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
@@ -39,10 +38,25 @@ public class MainActivity extends Activity {
         int itemId = item.getItemId();
         switch (itemId) {
             case android.R.id.home:
-                getFragmentManager().popBackStack();
+                if (getFragmentManager().getBackStackEntryCount() > 0){
+                    getFragmentManager().popBackStack();
+                if (getFragmentManager().getBackStackEntryCount() == 1) {
+                    getActionBar().setHomeButtonEnabled(false);
+                    getActionBar().setDisplayHomeAsUpEnabled(false);
+                    getActionBar().setTitle(getResources().getString(R.string.app_name));
+                }}
                 break;
         }
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (getFragmentManager().getBackStackEntryCount() == 0) {
+            getActionBar().setDisplayHomeAsUpEnabled(false);
+            getActionBar().setTitle(getResources().getString(R.string.app_name));
+        }
     }
 
     public void showDetailFragment(Fragment fragment) {
@@ -56,6 +70,7 @@ public class MainActivity extends Activity {
             getFragmentManager().
                     beginTransaction().
                     replace(R.id.flDetail_M, fragment).
+                    addToBackStack(null).
                     commit();
     }
 }

@@ -46,12 +46,17 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = LayoutInflater.from(mActivity).inflate(R.layout.detail_fragment, null);
+
         mTitleDescription = (TextView) v.findViewById(R.id.tvDescriptionText_DF);
         mLogoDescription = (ImageView) v.findViewById(R.id.imDescriptionLogo_DF);
         btnPositive = (Button) v.findViewById(R.id.btnPositive_DF);
         btnNegative = (Button) v.findViewById(R.id.btnNegative_DF);
+
         btnPositive.setOnClickListener(this);
         btnNegative.setOnClickListener(this);
+
+        mActivity.getActionBar().setDisplayHomeAsUpEnabled(true);
+        mActivity.getActionBar().setHomeButtonEnabled(true);
 
         downloadCaseFromId(caseId);
         return v;

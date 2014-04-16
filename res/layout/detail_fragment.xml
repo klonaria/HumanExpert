@@ -9,7 +9,6 @@
             android:id="@+id/tvDescriptionText_DF"
             android:layout_margin="10dp"
             android:textSize="@dimen/desc_text_size"
-            android:text="Description Title"
             android:textColor="@android:color/black"
             android:gravity="center_horizontal"
             android:textStyle="bold"
@@ -33,13 +32,15 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:id="@+id/btnNegative_DF"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:visibility="gone"/>
 
         <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:layout_weight="1"
-                android:id="@+id/btnPositive_DF"/>
+                android:id="@+id/btnPositive_DF"
+                android:visibility="gone"/>
             </LinearLayout>
 </RelativeLayout>

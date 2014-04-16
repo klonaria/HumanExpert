@@ -39,6 +39,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private TextView mTitleDescription;
     private ImageView mLogoDescription;
     private int position = 0;
+    private int caseId = 0;
     private ScenariosModel dataPositive, dataNegative;
     private CasesModel dataDescription;
 
@@ -52,7 +53,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         btnPositive.setOnClickListener(this);
         btnNegative.setOnClickListener(this);
 
-        downloadCaseFromId(ListsData.getScenariosList().get(position).caseId);
+        downloadCaseFromId(caseId);
         return v;
     }
 
@@ -62,6 +63,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         mActivity = activity;
         if (getArguments().containsKey(Constants.BUNDLE_POSITION))
             position = getArguments().getInt(Constants.BUNDLE_POSITION);
+        if (getArguments().containsKey(Constants.FIELD_ID))
+            caseId = getArguments().getInt(Constants.FIELD_ID);
         mActivity.getActionBar().setTitle(ListsData.getScenariosList().get(position).text);
     }
 
@@ -69,14 +72,22 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btnNegative_DF:
-                if (dataNegative != null)
-                    downloadCaseFromId(dataNegative.caseId);
+                answerQuestion(dataNegative.caseId);
                 break;
             case R.id.btnPositive_DF:
-                if (dataPositive != null)
-                    downloadCaseFromId(dataPositive.caseId);
+                answerQuestion(dataPositive.caseId);
                 break;
         }
+    }
+
+    private void answerQuestion(int caseId){
+        DetailFragment detailFragment = new DetailFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt(Constants.BUNDLE_POSITION, position);
+        bundle.putInt(Constants.FIELD_ID, caseId);
+        detailFragment.setArguments(bundle);
+
+        ((MainActivity) mActivity).showDetailFragment(detailFragment);
     }
 
     private void downloadCaseFromId(int caseId) {
@@ -126,11 +137,17 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             if (mProgressDialog != null)
                 if (mProgressDialog.isShowing())
                     mProgressDialog.dismiss();
-            if (dataNegative != null && dataPositive != null) {
-                btnNegative.setText(dataNegative.text);
-                btnPositive.setText(dataPositive.text);
+
+            if (dataDescription != null) {
                 mLogoDescription.setImageBitmap(dataDescription.image);
                 mTitleDescription.setText(dataDescription.text);
+            }
+
+            if (dataNegative != null && dataPositive != null) {
+                btnNegative.setVisibility(View.VISIBLE);
+                btnPositive.setVisibility(View.VISIBLE);
+                btnNegative.setText(dataNegative.text);
+                btnPositive.setText(dataPositive.text);
             }
         }
 

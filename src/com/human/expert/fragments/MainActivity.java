@@ -41,9 +41,7 @@ public class MainActivity extends Activity {
             case android.R.id.home:
                 getFragmentManager().popBackStack();
                 break;
-
         }
-
         return true;
     }
 

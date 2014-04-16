@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">HumanExpert</string>
+    <string name="no_internet">No internet connection</string>
+    <string name="end_expert">Experts nothing more you can not help</string>
 </resources>

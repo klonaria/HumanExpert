@@ -14,11 +14,11 @@ import com.human.expert.variables.ListsData;
  */
 public class ScenariosAdapter extends BaseAdapter{
     private Context mContext;
-    private LayoutInflater lf;
+    private LayoutInflater mLf;
 
     public ScenariosAdapter (Context context){
         this.mContext = context;
-        lf = LayoutInflater.from(mContext);
+        mLf = LayoutInflater.from(mContext);
     }
 
 
@@ -41,7 +41,7 @@ public class ScenariosAdapter extends BaseAdapter{
     public View getView(final int position, View convertView, ViewGroup parent) {
         TextView field = null;
         if (convertView == null){
-            convertView = lf.inflate(R.layout.item_scanarios_list, null);
+            convertView = mLf.inflate(R.layout.item_scanarios_list, null);
             field = (TextView) convertView.findViewById(R.id.tvItem_IL);
             convertView.setTag(field);
         } field = (TextView) convertView.getTag();

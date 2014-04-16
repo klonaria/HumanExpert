@@ -17,4 +17,6 @@ public abstract class Constants {
     public static final String FIELD_CASE_ID = "caseId";
 
     public static final String BUNDLE_POSITION = "position";
+
+    public static final String LOG_ERROR = "tag_error";
 }

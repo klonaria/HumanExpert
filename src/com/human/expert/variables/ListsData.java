@@ -14,11 +14,7 @@ public abstract class ListsData {
         return scenariosList;
     }
 
-    public static void setScenariosList(ArrayList<ScenariosModel> scenariosList) {
-        ListsData.scenariosList = scenariosList;
-    }
-
-    public static void initScenariouList(){
+    public static void initScenariosList(){
         scenariosList = new ArrayList<ScenariosModel>();
     }
 }

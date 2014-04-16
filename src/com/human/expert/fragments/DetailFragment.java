@@ -3,23 +3,25 @@ package com.human.expert.fragments;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.Fragment;
-import android.app.ProgressDialog;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import com.human.expert.R;
 import com.human.expert.adapters.CasesModel;
-import com.human.expert.adapters.ScenariosAdapter;
 import com.human.expert.adapters.ScenariosModel;
 import com.human.expert.variables.Constants;
 import com.human.expert.variables.ListsData;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -31,7 +33,7 @@ import java.net.URL;
 /**
  * Created by Michal365 on 15.04.2014.
  */
-public class DetailFragment extends Fragment implements View.OnClickListener{
+public class DetailFragment extends Fragment implements View.OnClickListener {
     private Activity mActivity;
     private Button btnPositive, btnNegative;
     private TextView mTitleDescription;
@@ -45,17 +47,12 @@ public class DetailFragment extends Fragment implements View.OnClickListener{
         View v = LayoutInflater.from(mActivity).inflate(R.layout.detail_fragment, null);
         mTitleDescription = (TextView) v.findViewById(R.id.tvDescriptionText_DF);
         mLogoDescription = (ImageView) v.findViewById(R.id.imDescriptionLogo_DF);
-        btnPositive = (Button) v.findViewById(R.id.btnPositive);
-        btnNegative = (Button) v.findViewById(R.id.btnNegative);
+        btnPositive = (Button) v.findViewById(R.id.btnPositive_DF);
+        btnNegative = (Button) v.findViewById(R.id.btnNegative_DF);
         btnPositive.setOnClickListener(this);
         btnNegative.setOnClickListener(this);
 
-        DownloadedCases downloadedCases = new DownloadedCases();
-        downloadedCases.execute(
-                Constants.URL_DOMAIN +
-                        Constants.URL_CASES +
-                        Constants.URL_RM +
-                        ListsData.getScenariosList().get(position).caseId);
+        downloadCaseFromId(ListsData.getScenariosList().get(position).caseId);
         return v;
     }
 
@@ -64,29 +61,48 @@ public class DetailFragment extends Fragment implements View.OnClickListener{
         super.onAttach(activity);
         mActivity = activity;
         if (getArguments().containsKey(Constants.BUNDLE_POSITION))
-        position = getArguments().getInt(Constants.BUNDLE_POSITION);
+            position = getArguments().getInt(Constants.BUNDLE_POSITION);
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.btnNegative:
-                DownloadedCases downloadedCasesNegative = new DownloadedCases();
-                downloadedCasesNegative.execute(
-                        Constants.URL_DOMAIN +
-                                Constants.URL_CASES +
-                                Constants.URL_RM +
-                                dataNegative.caseId);
+        switch (v.getId()) {
+            case R.id.btnNegative_DF:
+                if (dataNegative != null)
+                    downloadCaseFromId(dataNegative.caseId);
                 break;
-            case R.id.btnPositive:
-                DownloadedCases downloadedCasesPositive = new DownloadedCases();
-                downloadedCasesPositive.execute(
-                        Constants.URL_DOMAIN +
-                                Constants.URL_CASES +
-                                Constants.URL_RM +
-                                dataPositive.caseId);
+            case R.id.btnPositive_DF:
+                if (dataPositive != null)
+                    downloadCaseFromId(dataPositive.caseId);
                 break;
         }
+    }
+
+    private void downloadCaseFromId(int caseId) {
+        if (isInternetConnected(mActivity)) {
+            DownloadedCases downloadedCasesPositive = new DownloadedCases();
+            downloadedCasesPositive.execute(
+                    Constants.URL_DOMAIN +
+                            Constants.URL_CASES +
+                            Constants.URL_RM + caseId
+            );
+        } else Toast.makeText(mActivity,
+                mActivity.getResources().getString(R.string.no_internet),
+                Toast.LENGTH_SHORT).show();
+    }
+
+    private static boolean isInternetConnected(Context context) {
+        ConnectivityManager con = (ConnectivityManager) context.getSystemService(Activity.CONNECTIVITY_SERVICE);
+        boolean wifi = con.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnectedOrConnecting();
+        boolean internet = false;
+        try {
+            if (con.getNetworkInfo(ConnectivityManager.TYPE_MOBILE) != null) {
+                internet = con.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected();
+            }
+        } catch (Exception e) {
+            Log.d(Constants.LOG_ERROR, "Error with internet: " + e.toString());
+        }
+        return (wifi || internet);
     }
 
     private class DownloadedCases extends AsyncTask<String, Void, Void> {
@@ -114,16 +130,16 @@ public class DetailFragment extends Fragment implements View.OnClickListener{
                 btnPositive.setText(dataPositive.text);
                 mLogoDescription.setImageBitmap(dataDescription.image);
                 mTitleDescription.setText(dataDescription.text);
-            } else Toast.makeText(mActivity, "End Expert Assistance", Toast.LENGTH_LONG).show();
+            }
         }
 
         @Override
         protected Void doInBackground(String... params) {
-            parseList(params[0]);
+            parseCase(params[0]);
             return null;
         }
 
-        private void parseList (String _url){
+        private void parseCase(String _url) {
             try {
                 URL url = new URL(_url);
 
@@ -133,35 +149,38 @@ public class DetailFragment extends Fragment implements View.OnClickListener{
                 StringBuilder data = new StringBuilder();
 
                 String line = "";
-                try {
-                    while ((line = rd.readLine()) != null) {
-                        data.append(line);
-                    }
-                } catch (IOException e) {}
+                while ((line = rd.readLine()) != null) {
+                    data.append(line);
+                }
                 dataStream.close();
 
-                JSONObject temp  = new JSONObject(data.toString());
-                JSONObject _case = temp.getJSONObject(Constants.FIELD_CASE);
-                dataDescription = new CasesModel(
-                        _case.getString(Constants.FIELD_TEXT),
-                        downloadBitmap(_case.getString(Constants.FIELD_IMAGE)),
-                        _case.getInt(Constants.FIELD_ID));
-                JSONArray _answers = _case.getJSONArray(Constants.FIELD_ANSWERS);
-                JSONObject object_positive = _answers.getJSONObject(0);
-                JSONObject object_negative = _answers.getJSONObject(1);
-                dataPositive = new ScenariosModel(
-                        object_positive.getString(Constants.FIELD_TEXT),
-                        object_positive.getInt(Constants.FIELD_ID),
-                        object_positive.getInt(Constants.FIELD_CASE_ID));
+                try {
+                    JSONObject temp = new JSONObject(data.toString());
+                    JSONObject _case = temp.getJSONObject(Constants.FIELD_CASE);
+                    dataDescription = new CasesModel(
+                            _case.getString(Constants.FIELD_TEXT),
+                            downloadBitmap(_case.getString(Constants.FIELD_IMAGE)),
+                            _case.getInt(Constants.FIELD_ID));
+                    JSONArray _answers = _case.getJSONArray(Constants.FIELD_ANSWERS);
 
-                dataNegative = new ScenariosModel(
-                        object_negative.getString(Constants.FIELD_TEXT),
-                        object_negative.getInt(Constants.FIELD_ID),
-                        object_negative.getInt(Constants.FIELD_CASE_ID));
+                    JSONObject object_positive = _answers.getJSONObject(0);
+                    JSONObject object_negative = _answers.getJSONObject(1);
 
-            } catch (Exception e)
-            {
-                e.printStackTrace();
+                    dataPositive = new ScenariosModel(
+                            object_positive.getString(Constants.FIELD_TEXT),
+                            object_positive.getInt(Constants.FIELD_ID),
+                            object_positive.getInt(Constants.FIELD_CASE_ID));
+
+                    dataNegative = new ScenariosModel(
+                            object_negative.getString(Constants.FIELD_TEXT),
+                            object_negative.getInt(Constants.FIELD_ID),
+                            object_negative.getInt(Constants.FIELD_CASE_ID));
+
+                } catch (JSONException e) {
+                    Log.d(Constants.LOG_ERROR, "Error parsing data: " + e.toString());
+                }
+            } catch (IOException e) {
+                Log.d(Constants.LOG_ERROR, "Error read text: " + e.toString());
             }
         }
 
@@ -169,11 +188,11 @@ public class DetailFragment extends Fragment implements View.OnClickListener{
             Bitmap result_icon = null;
             try {
                 URL imageUrl = new URL(url_icon);
-                if(imageUrl != null) {
+                if (imageUrl != null) {
                     result_icon = BitmapFactory.decodeStream(imageUrl.openConnection().getInputStream());
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.d(Constants.LOG_ERROR, "Error download image: " + e.toString());
             }
             return result_icon;
         }

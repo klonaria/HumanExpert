@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/imDescriptionLogo_DF"
-            android:layout_below="@+id/tvDescriptionText_DF"
+            android:layout_below="@id/tvDescriptionText_DF"
             android:layout_above="@+id/llBlockCheckButton_DF"/>
     <LinearLayout
             android:layout_width="match_parent"
@@ -32,7 +32,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:id="@+id/btnNegative"
+                android:id="@+id/btnNegative_DF"
                 android:layout_weight="1"/>
 
         <Button
@@ -40,6 +40,6 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:layout_weight="1"
-                android:id="@+id/btnPositive"/>
+                android:id="@+id/btnPositive_DF"/>
             </LinearLayout>
 </RelativeLayout>

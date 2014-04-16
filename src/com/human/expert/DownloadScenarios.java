@@ -5,11 +5,14 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
+import android.util.Log;
+import android.widget.Toast;
 import com.human.expert.adapters.ScenariosAdapter;
 import com.human.expert.adapters.ScenariosModel;
 import com.human.expert.variables.Constants;
 import com.human.expert.variables.ListsData;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -26,7 +29,7 @@ public class DownloadScenarios extends AsyncTask<String, Void, Void> {
     private Dialog mProgressDialog;
     private ScenariosAdapter mScAdapter;
 
-    public DownloadScenarios(Activity context, ScenariosAdapter _adapter){
+    public DownloadScenarios(Activity context, ScenariosAdapter _adapter) {
         this.mContext = context;
         this.mScAdapter = _adapter;
     }
@@ -57,7 +60,7 @@ public class DownloadScenarios extends AsyncTask<String, Void, Void> {
         return null;
     }
 
-    private void parseList (String _url){
+    private void parseList(String _url) {
         try {
             URL url = new URL(_url);
 
@@ -67,26 +70,27 @@ public class DownloadScenarios extends AsyncTask<String, Void, Void> {
             StringBuilder data = new StringBuilder();
 
             String line = "";
-            try {
-                while ((line = rd.readLine()) != null) {
-                    data.append(line);
-                }
-            } catch (IOException e) {}
-            dataStream.close();
-
-            JSONObject temp  = new JSONObject(data.toString());
-            JSONArray arrayScenarious = temp.getJSONArray(Constants.FIELD_SCENARIOS);
-
-            for (int i = 0; i < arrayScenarious.length(); i++){
-                JSONObject item = arrayScenarious.getJSONObject(i);
-                ListsData.getScenariosList().add(new ScenariosModel(
-                        item.getString(Constants.FIELD_TEXT),
-                        item.getInt(Constants.FIELD_ID),
-                        item.getInt(Constants.FIELD_CASE_ID)));
+            while ((line = rd.readLine()) != null) {
+                data.append(line);
             }
-        } catch (Exception e)
-        {
-            e.printStackTrace();
+
+            dataStream.close();
+            try {
+                JSONObject temp = new JSONObject(data.toString());
+                JSONArray arrayScenarious = temp.getJSONArray(Constants.FIELD_SCENARIOS);
+
+                for (int i = 0; i < arrayScenarious.length(); i++) {
+                    JSONObject item = arrayScenarious.getJSONObject(i);
+                    ListsData.getScenariosList().add(new ScenariosModel(
+                            item.getString(Constants.FIELD_TEXT),
+                            item.getInt(Constants.FIELD_ID),
+                            item.getInt(Constants.FIELD_CASE_ID)));
+                }
+            } catch (JSONException e) {
+                Log.d(Constants.LOG_ERROR, "Error parsing data: " + e.toString());
+            }
+        } catch (IOException e) {
+            Log.d(Constants.LOG_ERROR, "Error read text: " + e.toString());
         }
     }
 }

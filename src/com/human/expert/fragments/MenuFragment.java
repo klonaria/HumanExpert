@@ -2,12 +2,16 @@ package com.human.expert.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 import com.human.expert.DownloadScenarios;
 import com.human.expert.R;
 import com.human.expert.adapters.ScenariosAdapter;
@@ -25,21 +29,26 @@ public class MenuFragment extends Fragment implements AdapterView.OnItemClickLis
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = LayoutInflater.from(mActivity).inflate(R.layout.menu_fragment, null);
-            mListMenu = (ListView) v.findViewById(R.id.lvMenu_MF);
+        mListMenu = (ListView) v.findViewById(R.id.lvMenu_MF);
 
-            setAdapterFromList();
-            mListMenu.setAdapter(mAdapter);
-            mListMenu.setOnItemClickListener(this);
+        setAdapterFromList();
+        mListMenu.setOnItemClickListener(this);
         return v;
     }
 
-    private void setAdapterFromList(){
+    private void setAdapterFromList() {
         mAdapter = new ScenariosAdapter(mActivity);
-        if (ListsData.getScenariosList() == null){
-            ListsData.initScenariouList();
-            DownloadScenarios downloadScenarios = new DownloadScenarios(mActivity, mAdapter);
-            downloadScenarios.execute(Constants.URL_DOMAIN + Constants.FIELD_SCENARIOS + Constants.URL_RM);
-        }
+        if (ListsData.getScenariosList() == null) {
+            if (isInternetConnected(mActivity)) {
+                ListsData.initScenariosList();
+                DownloadScenarios downloadScenarios = new DownloadScenarios(mActivity, mAdapter);
+                downloadScenarios.execute(Constants.URL_DOMAIN + Constants.FIELD_SCENARIOS + Constants.URL_RM);
+                mListMenu.setAdapter(mAdapter);
+            } else Toast.makeText(mActivity,
+                mActivity.getResources().getString(R.string.no_internet),
+                Toast.LENGTH_SHORT).show();
+        } else
+            mListMenu.setAdapter(mAdapter);
     }
 
     @Override
@@ -55,5 +64,19 @@ public class MenuFragment extends Fragment implements AdapterView.OnItemClickLis
         bundle.putInt(Constants.BUNDLE_POSITION, position);
         detailFragment.setArguments(bundle);
         ((MainActivity) mActivity).showDetailFragment(detailFragment);
+    }
+
+    public static boolean isInternetConnected(Context context) {
+        ConnectivityManager con = (ConnectivityManager) context.getSystemService(Activity.CONNECTIVITY_SERVICE);
+        boolean wifi = con.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnectedOrConnecting();
+        boolean internet = false;
+        try {
+            if (con.getNetworkInfo(ConnectivityManager.TYPE_MOBILE) != null) {
+                internet = con.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected();
+            }
+        } catch (Exception e) {
+            Log.d(Constants.LOG_ERROR, "Error with internet: " + e.toString());
+        }
+        return (wifi || internet);
     }
 }

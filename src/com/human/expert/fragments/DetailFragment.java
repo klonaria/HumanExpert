@@ -62,6 +62,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         mActivity = activity;
         if (getArguments().containsKey(Constants.BUNDLE_POSITION))
             position = getArguments().getInt(Constants.BUNDLE_POSITION);
+        mActivity.getActionBar().setTitle(ListsData.getScenariosList().get(position).text);
     }
 
     @Override

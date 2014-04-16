@@ -7,6 +7,7 @@
     <ListView
             android:id="@+id/lvMenu_MF"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:focusable="false">
     </ListView>
 </RelativeLayout>

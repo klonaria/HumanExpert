@@ -63,6 +63,7 @@ public class MenuFragment extends Fragment implements AdapterView.OnItemClickLis
         Bundle bundle = new Bundle();
         bundle.putInt(Constants.BUNDLE_POSITION, position);
         detailFragment.setArguments(bundle);
+
         ((MainActivity) mActivity).showDetailFragment(detailFragment);
     }
 

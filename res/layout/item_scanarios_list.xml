@@ -8,6 +8,7 @@
             android:padding="10dp"
             android:textSize="@dimen/list_text_size"
             android:singleLine="true"
-            android:id="@+id/tvItem_IL">
+            android:id="@+id/tvItem_IL"
+        >
 
     </TextView>

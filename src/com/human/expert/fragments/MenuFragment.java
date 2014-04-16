@@ -66,7 +66,7 @@ public class MenuFragment extends Fragment implements AdapterView.OnItemClickLis
         ((MainActivity) mActivity).showDetailFragment(detailFragment);
     }
 
-    public static boolean isInternetConnected(Context context) {
+    private static boolean isInternetConnected(Context context) {
         ConnectivityManager con = (ConnectivityManager) context.getSystemService(Activity.CONNECTIVITY_SERVICE);
         boolean wifi = con.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnectedOrConnecting();
         boolean internet = false;
